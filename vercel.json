@@ -1,4 +1,9 @@
 {
   "version": 2,
-  "framework": "vite"
+  "framework": "vite",
+  "functions": {
+    "api/[...slug].ts": {
+      "includeFiles": ["lib/**"]
+    }
+  }
 }
