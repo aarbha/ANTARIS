@@ -197,6 +197,14 @@ Browser (React)  ──2s poll──>  API Server  ──>  NCPOR / Open-Meteo /
 
 ---
 
+## Team
+
+- [swapnilgaur06](https://github.com/swapnilgaur06)
+- [rahatarora31](https://github.com/rahatarora31)
+- [harjotsinghajmanis-eng](https://github.com/harjotsinghajmanis-eng)
+
+---
+
 ## Data Sources & References
 
 All live data in Antaris comes from publicly available research APIs. No synthetic or mock data is used for external feeds.
