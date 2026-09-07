@@ -98,8 +98,12 @@ const baselineInitialized = new Set<string>()
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   store.init()
 
-  const slug = (req.query.slug as string[]) || []
-  const path = "/" + slug.join("/")
+  const urlPath = (req.url || "").split("?")[0] || ""
+  const slugFromUrl = urlPath.startsWith("/api/") ? urlPath.slice(5) : ""
+  const slugFromQuery = Array.isArray(req.query.slug)
+    ? (req.query.slug as string[]).join("/")
+    : (req.query.slug as string | undefined) || ""
+  const path = "/" + (slugFromUrl || slugFromQuery)
 
   try {
     // ── Health ──
@@ -111,8 +115,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (path === "/stations" && req.method === "GET") {
       return res.json(STATIONS_DB)
     }
-    if (slug[0] === "stations" && slug[1] && req.method === "GET") {
-      const station = STATIONS_DB.find(s => s.id === slug[1])
+    if (path.startsWith("/stations/") && req.method === "GET") {
+      const stationId = path.split("/")[2]
+      const station = STATIONS_DB.find(s => s.id === stationId)
       if (!station) return res.status(404).json({ error: "Station not found" })
       return res.json(station)
     }
