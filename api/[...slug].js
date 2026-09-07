@@ -1214,10 +1214,13 @@ async function handler(req, res) {
       if (!store.telemetry.has(key) || store.telemetry.get(key).length < 100) {
         generateHistoryBuffer(stationId, 48);
       }
-      const { temp: liveTemp, source } = await getLiveOutdoorTemp(stationId);
-      const outdoorOverride = liveTemp ?? void 0;
-      const values = generateTelemetry(stationId, { outdoorOverride });
-      const ncporData = await getNcporStationData(stationId);
+      const [liveTempResult, ncporData, weather] = await Promise.all([
+        getLiveOutdoorTemp(stationId),
+        getNcporStationData(stationId),
+        getOpenMeteoWeather(stationId)
+      ]);
+      const { temp: liveTemp, source } = liveTempResult;
+      const values = generateTelemetry(stationId, { outdoorOverride: liveTemp ?? void 0 });
       let live_wind_ms = null;
       let live_pressure_mbar = null;
       let live_humidity_pct = null;
@@ -1229,11 +1232,16 @@ async function handler(req, res) {
         live_ncpor_timestamp = ncporData.current.timestamp_ms ? new Date(ncporData.current.timestamp_ms).toISOString() : null;
       }
       if (live_wind_ms !== null) values.wind_speed_kmh = Math.round(live_wind_ms * 3.6 * 10) / 10;
-      const weather = await getOpenMeteoWeather(stationId);
       const shortwaveRadiation = weather?.current?.shortwave_radiation ?? 0;
       values.solar_output_kw = Math.round(shortwaveRadiation * 25 * 0.2 / 1e3 * 1e3) / 1e3;
-      for (const [metric, value] of Object.entries(values)) {
-        store.pushTelemetry(stationId, metric, value, UNITS[metric] || "");
+      const now = Date.now();
+      const lastPush = store._lastTelemetryPush?.[stationId] ?? 0;
+      if (now - lastPush > 1e4) {
+        for (const [metric, value] of Object.entries(values)) {
+          store.pushTelemetry(stationId, metric, value, UNITS[metric] || "");
+        }
+        if (!store._lastTelemetryPush) store._lastTelemetryPush = {};
+        store._lastTelemetryPush[stationId] = now;
       }
       return res.json({ station_id: stationId, timestamp: (/* @__PURE__ */ new Date()).toISOString(), values, temperature_source: source, live_wind_ms, live_pressure_mbar, live_humidity_pct, live_solar_radiation_wm2: shortwaveRadiation, live_ncpor_timestamp });
     }

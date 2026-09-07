@@ -471,7 +471,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         // Don't permanently disable — just skip this tick
         backendAvailable.current = false
       }
-    }, 5000)
+    }, 2000)
 
     return () => {
       if (pollingRef.current) clearInterval(pollingRef.current)
