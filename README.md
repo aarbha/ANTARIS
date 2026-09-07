@@ -23,7 +23,7 @@ No static mockups. No fake numbers. Every data point traces back to either a rea
 
 ## Live Demo
 
-A working prototype was demonstrated live during the hackathon. The dashboard showed:
+The dashboard shows:
 
 - Real-time telemetry from NCPOR (India's National Centre for Polar and Ocean Research) flowing into the system
 - ML predictions updating dynamically as new sensor data arrived
