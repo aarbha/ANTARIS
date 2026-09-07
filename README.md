@@ -30,7 +30,9 @@ The dashboard shows:
 - A disaster simulation running a "Severe Storm" scenario with timeline, milestones, and risk assessment
 - Role-based access between Admin (HQ) and Researcher (field station) views
 
-**[Screenshots will be added here]**
+### Screenshots
+
+![Antaris Dashboard](screenshots/dashboard.jpeg)
 
 ---
 
