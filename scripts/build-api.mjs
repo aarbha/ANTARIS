@@ -6,8 +6,8 @@ await build({
   platform: "node",
   target: "node22",
   format: "esm",
-  outfile: "api/[...slug].mjs",
+  outfile: "api/[...slug].js",
   packages: "external",
 })
 
-console.log("API handler bundled -> api/[...slug].mjs")
+console.log("API handler bundled -> api/[...slug].js")
