@@ -197,9 +197,23 @@ Browser (React)  ──2s poll──>  API Server  ──>  NCPOR / Open-Meteo /
 
 ---
 
+## Data Sources & References
+
+All live data in Antaris comes from publicly available research APIs. No synthetic or mock data is used for external feeds.
+
+| Source | Description | URL |
+|--------|------------|-----|
+| **NCPOR** | India's National Centre for Polar and Ocean Research — live temperature, wind speed, air pressure, and humidity readings scraped from Maitri and Bharati station live pages | https://data.ncpor.res.in |
+| **Open-Meteo** | Free weather forecast API — provides hourly temperature, wind, humidity, shortwave radiation (used for solar energy calculations), and WMO weather codes | https://open-meteo.com |
+| **NOAA SWPC** | US Space Weather Prediction Center — real-time aurora probability (OVATION model) and planetary Kp geomagnetic index | https://www.swpc.noaa.gov |
+| **NSIDC Sea Ice Index** | National Snow and Ice Data Center — daily Antarctic sea ice extent CSV data used for anomaly detection and route safety classification | https://nsidc.org/data/seaice_index |
+| **COMNAP** | Council of Managers of Antarctic Programs — station metadata, coordinates, and operational details for Maitri (est. 1989) and Bharati (est. 2012) | https://www.comnap.aq |
+
+---
+
 ## Acknowledgements
 
-- **NCPOR** — National Centre for Polar and Ocean Research, Ministry of Earth Sciences, Government of India — for live Antarctic station data
+- **NCPOR** — National Centre for Polar and Ocean Research, Ministry of Earth Sciences, Government of India
 - **Open-Meteo** — Free weather forecast API
 - **NOAA SWPC** — Space Weather Prediction Center for aurora and geomagnetic data
 - **NSIDC** — National Snow and Ice Data Center for sea ice extent
