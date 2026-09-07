@@ -1,0 +1,11 @@
+{
+  "title": "Antartica_dashboard",
+  "description": "Provides comprehensive oceanographic and marine data for researchers and policymakers to support marine science and environmental management.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
