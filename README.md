@@ -34,6 +34,12 @@ The dashboard shows:
 
 ![Antaris Dashboard](screenshots/dashboard.jpeg)
 
+![Antaris Screen 2](screenshots/screen2.jpeg)
+
+![Antaris Screen 3](screenshots/screen3.jpeg)
+
+![Antaris Screen 4](screenshots/screen4.jpeg)
+
 ---
 
 ## Features
