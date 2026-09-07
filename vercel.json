@@ -3,7 +3,7 @@
   "framework": "vite",
   "functions": {
     "api/[...slug].ts": {
-      "includeFiles": ["lib/**"]
+      "includeFiles": "lib/**"
     }
   }
 }
