@@ -7,7 +7,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { join } from "node:path"
 import { pathToFileURL } from "node:url"
 
-const HANDLER_PATH = "./api/[...slug]"
+const HANDLER_PATH = "./server/handler.ts"
 
 let cachedHandler: any = null
 
