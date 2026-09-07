@@ -200,7 +200,7 @@ Browser (React)  ──2s poll──>  API Server  ──>  NCPOR / Open-Meteo /
 ## Contributors
 
 - [swapnilgaur06](https://github.com/swapnilgaur06)
-- [rahatarora31](https://github.com/rahatarora31)
+- [codeaurora31](https://github.com/codeaurora31)
 - [harjotsinghajmanis-eng](https://github.com/harjotsinghajmanis-eng)
 - [itspriyanshigarg](https://github.com/itspriyanshigarg)
 
