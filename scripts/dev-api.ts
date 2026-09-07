@@ -1,5 +1,5 @@
 /**
- * Local dev API shim — runs Vercel handler modules on http://localhost:8001
+ * Local dev API shim — runs the Vercel catch-all handler on http://localhost:8001
  * Usage: npx tsx scripts/dev-api.ts
  * Then: pnpm dev (separate terminal) — Vite proxy forwards /api/* to :8001
  */
@@ -7,41 +7,16 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { join } from "node:path"
 import { pathToFileURL } from "node:url"
 
-// Route map: path pattern → handler module path (relative to project root)
-const ROUTES: [RegExp, string][] = [
-  [/^\/api\/health$/, "./api/health"],
-  [/^\/api\/stations\/(\w+)$/, "./api/stations/[id]"],
-  [/^\/api\/stations$/, "./api/stations"],
-  [/^\/api\/telemetry\/latest$/, "./api/telemetry/latest"],
-  [/^\/api\/telemetry\/history$/, "./api/telemetry/history"],
-  [/^\/api\/predict\/fuel$/, "./api/predict/fuel"],
-  [/^\/api\/predict\/temperature$/, "./api/predict/temperature"],
-  [/^\/api\/predict\/rpm-health$/, "./api/predict/rpm-health"],
-  [/^\/api\/predict\/anomalies$/, "./api/predict/anomalies"],
-  [/^\/api\/predict\/model-accuracy$/, "./api/predict/model-accuracy"],
-  [/^\/api\/predict\/ensemble$/, "./api/predict/ensemble"],
-  [/^\/api\/alerts$/, "./api/alerts"],
-  [/^\/api\/energy\/optimize$/, "./api/energy/optimize"],
-  [/^\/api\/energy\/savings$/, "./api/energy/savings"],
-  [/^\/api\/logistics$/, "./api/logistics"],
-  [/^\/api\/routes$/, "./api/routes"],
-  [/^\/api\/seaice$/, "./api/seaice"],
-  [/^\/api\/simulation\/whatif$/, "./api/simulation/whatif"],
-  [/^\/api\/fault$/, "./api/fault"],
-  [/^\/api\/weather$/, "./api/weather"],
-  [/^\/api\/aurora$/, "./api/aurora"],
-]
+const HANDLER_PATH = "./api/[...slug]"
 
-// Cache loaded handlers
-const handlerCache = new Map<string, any>()
+let cachedHandler: any = null
 
-async function loadHandler(modulePath: string): Promise<any> {
-  if (handlerCache.has(modulePath)) return handlerCache.get(modulePath)
-  const fullPath = pathToFileURL(join(process.cwd(), modulePath)).href
+async function loadHandler(): Promise<any> {
+  if (cachedHandler) return cachedHandler
+  const fullPath = pathToFileURL(join(process.cwd(), HANDLER_PATH)).href
   const mod = await import(fullPath)
-  const handler = mod.default
-  handlerCache.set(modulePath, handler)
-  return handler
+  cachedHandler = mod.default
+  return cachedHandler
 }
 
 function parseQuery(url: string): Record<string, string> {
@@ -80,32 +55,16 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
   res.setHeader("Access-Control-Allow-Headers", "Content-Type")
   if (req.method === "OPTIONS") { res.writeHead(204); res.end(); return }
 
-  // Find matching route
-  let matchedHandler: string | null = null
-  let matchParams: Record<string, string> = {}
-
-  for (const [pattern, modulePath] of ROUTES) {
-    const m = pathname.match(pattern)
-    if (m) {
-      matchedHandler = modulePath
-      if (m[1]) matchParams.id = m[1]
-      break
-    }
-  }
-
-  if (!matchedHandler) {
-    res.writeHead(404, { "Content-Type": "application/json" })
-    res.end(JSON.stringify({ error: `No route: ${pathname}` }))
-    return
-  }
+  // Strip /api prefix → slug is the rest
+  const slugPath = pathname.replace(/^\/api\//, "").replace(/^\//, "")
+  const slug = slugPath ? slugPath.split("/") : []
 
   try {
-    const handler = await loadHandler(matchedHandler)
+    const handler = await loadHandler()
     const query = parseQuery(url)
-    Object.assign(query, matchParams)
+    query.slug = slug
     const body = req.method === "POST" || req.method === "PUT" ? await readBody(req) : {}
 
-    // Build VercelRequest-like object
     const vReq = {
       method: req.method,
       query,
@@ -114,7 +73,6 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
       headers: req.headers,
     }
 
-    // Build VercelResponse-like object
     const vRes: any = {
       _status: 200,
       _headers: new Map<string, string>(),
@@ -140,5 +98,5 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
 
 server.listen(PORT, () => {
   console.log(`[api-shim] API server running at http://localhost:${PORT}`)
-  console.log(`[api-shim] Routes: ${ROUTES.length} endpoints mapped`)
+  console.log(`[api-shim] Catch-all handler: ${HANDLER_PATH}`)
 })
